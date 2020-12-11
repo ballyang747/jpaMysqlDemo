@@ -5,9 +5,9 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.*;
 import java.util.Date;
 
-@Table(name="Test1")
+@Table(name="test1")
 @Entity
-public class Test1 {
+public class Test1Bean {
      @Id
      @GeneratedValue(strategy =  GenerationType.IDENTITY)
      private  int  id;

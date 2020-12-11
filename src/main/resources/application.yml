@@ -11,9 +11,7 @@ spring:
     url: jdbc:mysql://localhost:3306/test1?serverTimezone=GMT%2B8&characterEncoding=utf-8
     username: root
     password: 1234
-    #url: jdbc:sqlserver://192.168.0.3:1433;databaseName=gtmc_dps leeder123  gtmc123  192.168.200.198
-    #username: sa
-    #password: Mai810916
+
     driver-class-name: com.mysql.cj.jdbc.Driver   #com.microsoft.sqlserver.jdbc.SQLServerDriver
     # 使用druid数据源
     platform: mysql
