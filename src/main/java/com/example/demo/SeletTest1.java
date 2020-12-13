@@ -1,16 +1,21 @@
 package com.example.demo;
 
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
+@Service
 public class SeletTest1 {
-    public static <T> List<T> selectResultByNative(T defaults, String dataSource,   String prefix ,  String[] list,   String sufix, Class<T> clazt) throws  Exception {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public  <T> List<T> selectResultByNative(T defaults, String dataSource,   String prefix ,  String[] list,   String sufix, Class<T> clazt) throws  Exception {
         //类签名
         String hashCode = "hashCode";
         String toString="equals";
@@ -75,13 +80,13 @@ public class SeletTest1 {
 
         }
         //读取数据库名字
-        sb.append("FROM");
+        sb.append("  FROM  ");
         if(annotation != null){
             sb.append("  "+annotation.name());
         }else{
             sb.append("  "+signName);
         }
-        sb.append("  WHERE  ");
+
         //读取后缀
         if(StringUtils.isEmpty(sufix)){
             Field[] fields  = clazz.getDeclaredFields();
@@ -110,6 +115,8 @@ public class SeletTest1 {
                     }
                     if(k!=0){
                         sb.append("  AND  ");
+                    }else {
+                        sb.append("  WHERE  ");
                     }
                     sb.append(colName);
                     sb.append(" =  ");
@@ -125,24 +132,25 @@ public class SeletTest1 {
         }
 
         System.out.println(sb.toString());
-       /* try {
-            //Query query = entityManager.createNativeQuery(sb.toString());
+       try {
+             Query query = entityManager.createNativeQuery(sb.toString(),clazt);
             //拼接结果给factType
             List resultList = query.getResultList();
-            for(Object obj : resultList){
-                Map row = (Map) obj;
-                T res = clazt.newInstance();
-                Class<?> clz = res.getClass();
-                for(String name :tempList){
-                    Field ff = clz.getField(name);
-                    ff.setAccessible(true);
-                    ff.set(res,row.get(name));
-                }
-                result.add(res);
+           System.out.println(resultList);
+           for(Object obj : resultList){
+                T row = (T) obj;
+//                T res = clazt.newInstance();
+//                Class<?> clz = res.getClass();
+////                for(String name :tempList){
+////                    Field ff = clz.getField(name);
+////                    ff.setAccessible(true);
+////                    ff.set(res,row.get(name));
+////                }
+                result.add(row);
             }
         }catch (Exception ex){
-            log.error("exec sql Script Exception:" + ex.getMessage());
-        }*/
+           System.out.println("exec sql Script Exception:" + ex.getMessage());
+        }
         return result;
     }
 

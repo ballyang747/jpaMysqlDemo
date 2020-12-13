@@ -1,17 +1,19 @@
-package com.example.demo;
+package com.example.demo.bean;
 
-import org.springframework.stereotype.Repository;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Table(name="test1")
 @Entity
+@Data
 public class Test1Bean {
      @Id
      @GeneratedValue(strategy =  GenerationType.IDENTITY)
-     private  int  id;
+     private  Integer  id;
      private  String content;
+     @Column(name="CreateDate")
      private  Date CreateDate;
 
     public int getId() {
@@ -36,5 +38,14 @@ public class Test1Bean {
 
     public void setCreateDate(Date createDate) {
         CreateDate = createDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Test1Bean{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", CreateDate=" + CreateDate +
+                '}';
     }
 }
