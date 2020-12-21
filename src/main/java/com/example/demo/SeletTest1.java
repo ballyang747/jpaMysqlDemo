@@ -139,13 +139,7 @@ public class SeletTest1 {
            System.out.println(resultList);
            for(Object obj : resultList){
                 T row = (T) obj;
-//                T res = clazt.newInstance();
-//                Class<?> clz = res.getClass();
-////                for(String name :tempList){
-////                    Field ff = clz.getField(name);
-////                    ff.setAccessible(true);
-////                    ff.set(res,row.get(name));
-////                }
+
                 result.add(row);
             }
         }catch (Exception ex){

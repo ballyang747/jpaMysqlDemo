@@ -1,6 +1,9 @@
 package com.example.demo;
 
 import com.example.demo.bean.Test1Bean;
+import com.example.demo.bean.UserEntity1;
+import com.example.demo.dao.UserRepository;
+import com.example.demo.dao.UserRepository1;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import java.util.List;
 class DemoApplicationTests {
 	@Autowired
 	private SeletTest1 seletTest1;
+	@Autowired
+	private UserRepository userRepository;
 
 	@Test
 	void contextLoads() throws Exception {
@@ -27,6 +32,15 @@ class DemoApplicationTests {
 	     for (Test1Bean rr :   restr ){
 
 			 System.out.println("结果"+rr);
+		}
+	}
+
+	@Test
+	void Tesdt2() throws Exception {
+		List<String> userEntity1s = userRepository.testProc(111, 111, 111);
+		for (String rr :   userEntity1s ){
+
+			System.out.println("结果"+rr);
 		}
 	}
 

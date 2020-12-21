@@ -12,11 +12,11 @@ spring:
       #primary是主要连接池,要加其他自行加
       primary:
        name: gtmcandon
-       url: jdbc:mysql://localhost:3306/test1?serverTimezone=GMT%2B8&characterEncoding=utf-8
-       username: root
+       url: jdbc:sqlserver://localhost:1433;databaseName=tool_manage
+       username: sa
        password: 1234
 
-       driver-class-name: com.mysql.cj.jdbc.Driver   #com.microsoft.sqlserver.jdbc.SQLServerDriver
+       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver   #com.microsoft.sqlserver.jdbc.SQLServerDriver  com.mysql.cj.jdbc.Driver
           # 使用druid数据源
        platform: mysql
        type: com.alibaba.druid.pool.DruidDataSource
@@ -49,7 +49,7 @@ spring:
     show-sql: true #多数据源下要指定数据源才能起效
     hibernate:
       ddl-auto: create  #多数据源下要指定数据源才能起效
-      primary-dialect: org.hibernate.dialect.MySQL5Dialect
+      primary-dialect: org.hibernate.dialect.SQLServer2008Dialect
       ##hibernate.second-dialect: org.hibernate.dialect.MySQL5Dialect
       #hibernate.format_sql: false
     #open-in-view: true
