@@ -12,9 +12,9 @@ spring:
       #primary是主要连接池,要加其他自行加
       primary:
        name: gtmcandon
-       url: jdbc:sqlserver://localhost:1433;databaseName=tool_manage
+       url: jdbc:sqlserver://101.200.127.27:1433;databaseName=tool_manage
        username: sa
-       password: 1234
+       password: 123456ASD!
 
        driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver   #com.microsoft.sqlserver.jdbc.SQLServerDriver  com.mysql.cj.jdbc.Driver
           # 使用druid数据源

@@ -1,7 +1,6 @@
 package com.example.demo.bean;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 
@@ -11,13 +10,13 @@ import javax.persistence.*;
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "carModelName", type = Integer.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "timesPerDay", type = Integer.class),
                 @StoredProcedureParameter(mode = ParameterMode.IN, name = "toolManageNo", type = Integer.class),
-                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "name", type = Integer.class)}
+                @StoredProcedureParameter(mode = ParameterMode.OUT, name = "nameresult", type = String.class)}
         )
 })
 @Data
-@Table(name = "t_user1")
+@Table(name = "car_model")
 public class TestSp {
     @Id
     @GeneratedValue//表示自增
-    private String name;
+    private Integer id;
 }

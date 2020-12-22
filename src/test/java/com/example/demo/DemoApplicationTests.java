@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.StoredProcedureQuery;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +24,8 @@ class DemoApplicationTests {
 	private SeletTest1 seletTest1;
 	@Autowired
 	private UserRepository userRepository;
-
+	@PersistenceContext
+	private EntityManager entityManager;
 	@Test
 	void contextLoads() throws Exception {
 		Test1Bean test1Bean = new Test1Bean();
@@ -37,11 +41,18 @@ class DemoApplicationTests {
 
 	@Test
 	void Tesdt2() throws Exception {
-		List<String> userEntity1s = userRepository.testProc(111, 111, 111);
-		for (String rr :   userEntity1s ){
+//  List<Object> pPlanCheck(@Param("carModelName") Integer aa, @Param("timesPerDay") Integer bb, @Param("toolManageNo") Integer cc, @Param("name") Integer dd);
+		StoredProcedureQuery checkInputCarDetail = entityManager.createNamedStoredProcedureQuery("checkInputCarDetail");
+		checkInputCarDetail.setParameter("carModelName",111);
+		checkInputCarDetail.setParameter("timesPerDay",111);
+		checkInputCarDetail.setParameter("toolManageNo",111);
 
-			System.out.println("结果"+rr);
-		}
+		checkInputCarDetail.execute();
+		List resultList = checkInputCarDetail.getResultList();
+		System.out.println(resultList.get(0));
+
+		//String res1 = (String) checkInputCarDetail.getOutputParameterValue("nameresult");
+		//System.out.println(res1);
 	}
 
 }
