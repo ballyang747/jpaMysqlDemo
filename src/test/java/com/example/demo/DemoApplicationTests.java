@@ -42,10 +42,10 @@ class DemoApplicationTests {
 	@Test
 	void Tesdt2() throws Exception {
 //  List<Object> pPlanCheck(@Param("carModelName") Integer aa, @Param("timesPerDay") Integer bb, @Param("toolManageNo") Integer cc, @Param("name") Integer dd);
-		StoredProcedureQuery checkInputCarDetail = entityManager.createNamedStoredProcedureQuery("checkInputCarDetail");
-		checkInputCarDetail.setParameter("carModelName",111);
-		checkInputCarDetail.setParameter("timesPerDay",111);
-		checkInputCarDetail.setParameter("toolManageNo",111);
+		StoredProcedureQuery checkInputCarDetail = entityManager.createNamedStoredProcedureQuery("testaaa");
+		checkInputCarDetail.setParameter("t11","111");
+		checkInputCarDetail.setParameter("t22","111");
+		//checkInputCarDetail.setParameter("toolManageNo",111);
 
 		checkInputCarDetail.execute();
 		List resultList = checkInputCarDetail.getResultList();

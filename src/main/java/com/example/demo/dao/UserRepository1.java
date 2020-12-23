@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface UserRepository1 extends JpaRepository<UserEntity1, Integer>{
 
-  @Procedure(name = "checkInputCarDetail")
-  List<Object> pPlanCheck(@Param("carModelName") Integer aa, @Param("timesPerDay") Integer bb, @Param("toolManageNo") Integer cc);
+  //@Procedure(name = "checkInputCarDetail")
+ // List<Object> pPlanCheck(@Param("carModelName") Integer aa, @Param("timesPerDay") Integer bb, @Param("toolManageNo") Integer cc);
 }
