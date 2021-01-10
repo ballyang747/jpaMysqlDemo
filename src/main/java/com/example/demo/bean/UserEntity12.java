@@ -1,20 +1,17 @@
 package com.example.demo.bean;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import lombok.Data;
-import org.springframework.lang.Nullable;
-
 import java.util.Date;
 
 @Entity
 @Data
 @Table(name = "car_model")
-public class UserEntity1 {
+public class UserEntity12 {
 
 
 	@Column(name="id")
@@ -23,7 +20,7 @@ public class UserEntity1 {
 	private String carModel;
 	@Column(name="create_time")
 	private Date createTime;
-	@Id
+    @Id
 	@Column(name="status")
     private Integer status;
 	@Column(name="remark")
@@ -37,7 +34,7 @@ public class UserEntity1 {
 		this.remark = remark;
 	}
 
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
@@ -62,7 +59,7 @@ public class UserEntity1 {
 	}
 
 	public Date getCreateTime() {
-		return createTime;
+		return this.createTime;
 	}
 
 	public void setCreateTime(Date createTime) {
@@ -76,7 +73,6 @@ public class UserEntity1 {
 				", carModel='" + carModel + '\'' +
 				", createTime=" + createTime +
 				", status=" + status +
-				", remark='" + remark + '\'' +
 				'}';
 	}
 }

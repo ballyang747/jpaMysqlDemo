@@ -55,4 +55,17 @@ class DemoApplicationTests {
 		//System.out.println(res1);
 	}
 
+
+	@Test
+	void Tesdt3() throws Exception {
+		UserEntity1 userEntity1 = new UserEntity1();
+
+		String[] strs = new String[]{};
+		List<UserEntity1> restr = seletTest1.selectResultByNative (userEntity1,"dddd","",strs ,"",UserEntity1.class);
+		for (UserEntity1 rr :   restr ){
+
+			System.out.println("结果"+rr.toString());
+		}
+	}
+
 }

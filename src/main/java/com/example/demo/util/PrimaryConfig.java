@@ -9,7 +9,9 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.context.annotation.Bean;
+ import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
+ import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
+ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
  import org.springframework.core.env.Environment;
@@ -71,7 +73,7 @@ public class PrimaryConfig {
 		map.put("hibernate.hbm2ddl.auto", "none"); //十分危险 建议写成NONE
 		map.put("hibernate.show_sql", "true");
 
-		Map<String,Object> properties = hibernateProperties.determineHibernateProperties(jpaPreperties.getProperties(),new HibernateSettings());
+		//Map<String,Object> properties = hibernateProperties.determineHibernateProperties(jpaPreperties.getProperties(),new HibernateSettings());
 		jpaPreperties.setProperties(map);
 		return builder
 				.dataSource(primaryDataSource)
