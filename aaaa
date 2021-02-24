@@ -1,0 +1,213 @@
+package com.leeder.gacAndon.common.opc;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.OPC.Result;
+import com.leeder.gacAndon.dao.OpcDataDao;
+import com.leeder.gacAndon.domain.OpcSetting;
+import com.leeder.gacAndon.domain.OpcStatus;
+import com.leeder.gacAndon.service.OpcAndonBlockButtonService;
+import com.leeder.gacAndon.service.OpcAndonButtonDataService;
+import com.leeder.gacAndon.service.OpcAndonFunctionButtonDataService;
+import com.leeder.gacAndon.service.OpcDataService;
+import com.leeder.gacAndon.service.OpcDelayService;
+import com.leeder.gacAndon.service.OpcMuteService;
+import com.leeder.gacAndon.service.impl.AndonServiceImpl;
+import com.leeder.gacAndon.util.Logger;
+
+
+@Component
+@Order(value = 2)
+public class BootRunService implements ApplicationRunner{
+	@Autowired
+	//日志简历及遍历所有tag
+	private OpcDataDao opcDataDao;
+	@Autowired
+	//业务处理类
+	private OpcDataService opcDataService;
+	@Autowired
+	private OpcAndonButtonDataService opcAndonButtonDataService;
+	@Autowired
+	private OpcAndonFunctionButtonDataService opcAndonFunctionButtonDataService;
+	@Autowired
+	private OpcAndonBlockButtonService opcAndonBlockButtonService;
+	@Autowired
+	private OpcDelayService opcDelayService;
+	@Autowired
+	private OpcMuteService opcMuteService;
+	//储存buff
+	private Map<String,OpcSetting> buff=new HashMap<>();
+	//储存HMI1 
+	public static  Map<String,OpcStatus> HmiBuff=new HashMap<>();
+	public static OpcSetting setting;
+	//储存关闭状态时候的opc状态
+	private static Map<String, OpcStatus> Closerbuffer = new ConcurrentHashMap<>();
+    public  static Boolean flag = true;
+	
+/*	@Autowired
+	private ClientlConfig clientlConfig;*/
+	
+	private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(150);
+	
+	private Integer key =0;
+	
+	private Long cSize =0L;
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		//
+	
+		List<OpcSetting> sets=opcDataDao.findAll();
+		for(OpcSetting set : sets) {
+			
+			buff.put(set.getId()+"", set);
+			setting=set;
+			OpcClients client=ClientManagers.connectServer(
+					set.getServerIp(),
+					set.getGroupName(),
+					set.getLoginName(),
+					set.getLoginPwd(), ""
+					);
+			//注册通知
+			if(client.countObservers()==0) {
+				client.addObserver(new Observer() {
+					
+					@Override
+					public void update(Observable o, Object arg) {
+						  Result result = (Result) arg;
+						  handleResult(result);//
+					}
+				});
+			}
+
+			client.asyncReadChange(set.getId()+"", set.getItemName(), 500,set.getGroupName());
+		
+		}
+	}
+	private void handleResult(Result result) {
+		HandleResults task = new HandleResults(result);
+		fixedThreadPool.submit(task);
+	}
+
+	private class  HandleResults  implements Runnable {
+		  private Result  result;
+		  
+			private HandleResults(Result result) {
+		                this.result = result;
+		}
+		@Override
+		public void run() {
+			if(result.getType().equals(com.OPC.ResultType.VALUE)) {
+				OpcSetting opc=buff.get(result.getId());
+				if(opc==null) {
+					Logger.error("buff no id="+result.getId()+" set");
+				}else {
+					//处理信息分发到不同的LOgger之中进行处理
+					try {
+						OpcStatus os = new OpcStatus();
+						os.setCreateTime(new Date());
+						os.setPlcStatus(result.getValue().toString());
+						os.setItemName(result.getItemId());
+						os.setIsNote(opc.getIsNote());
+						Closerbuffer.put(result.getId(), os);
+						if(StringUtils.isEmpty(AndonServiceImpl.closeState)||!AndonServiceImpl.closeState) {
+							//判断Closerbuffer是否为空
+							if(!flag) {
+								//恢复后第一次会进来这个方法
+								//这个方法目的的将最新值更新到安东屏幕上
+								syncstate();
+							}	
+							if(0==opc.getIsNote()) {
+								opcDataService.DataLogger(os);//记录日志
+						if("1".equals(opc.getUpdateColum())) {
+									HmiBuff.put(result.getItemId(),os);
+								}
+						}else if(1==opc.getIsNote()) {
+							opcAndonButtonDataService.OldAndonLogger(os);//记录日志  按钮组
+						}else if(2==opc.getIsNote()) {
+							opcAndonFunctionButtonDataService.ButtonAndonLogger(os);//记录日志  功能按钮组
+						}else if(3==opc.getIsNote()) {
+							opcAndonBlockButtonService.ButtonAndonLogger(os);//阻塞信号组
+						}else if(4==opc.getIsNote()) {
+							opcDelayService.DataLogger(os);//红黄灯处理
+						}else if(5==opc.getIsNote()) { //静音处理逻辑
+							opcMuteService.DataLogger(os);//mute
+							}
+							 
+							cSize++;
+							
+					    if(HmiBuff.size()==6&&key==0&&cSize>858) {
+								key++;
+								readHMI();
+							}
+					    if(cSize >1000000) {
+					    	cSize =0L;
+					    }
+						}else {
+							//当设定为关闭状态时,只储存该opcItem的最新状态
+							flag =false;
+							
+						}
+						System.out.println("logger!!!");			
+					}catch(Exception e) {
+						Logger.error("andon value handle error",e);
+					}
+				}
+			}else {
+				Logger.warn(result.toString());
+			}
+		}
+	}
+	//加载完成后将缓存的HMI信息送去消息处理类之中
+	    @Async
+		private void readHMI() throws Exception {
+	         HmiBuff.forEach((k,v)->{ 
+                opcDataService.DataLogger(v);
+	         });
+			
+		}
+	    
+	    @Async
+	    private synchronized  void   syncstate() {
+	    	//首先判断buffer是否为空 再执行动作
+	    	if(!Closerbuffer.isEmpty()) {
+	    		Closerbuffer.forEach((k,opc)->{
+	    	try {
+	    		if(0==opc.getIsNote()) {
+						opcDataService.DataLogger(opc);//记录日志
+				}else if(1==opc.getIsNote()) {
+					opcAndonButtonDataService.OldAndonLogger(opc);//记录日志  按钮组
+				}else if(2==opc.getIsNote()) {
+					opcAndonFunctionButtonDataService.ButtonAndonLogger(opc);//记录日志  功能按钮组
+				}else if(3==opc.getIsNote()) {
+					opcAndonBlockButtonService.ButtonAndonLogger(opc);//阻塞信号组
+				}else if(4==opc.getIsNote()) {
+					opcDelayService.DataLogger(opc);//红黄灯处理
+				}else if(5==opc.getIsNote()) { 
+					opcMuteService.DataLogger(opc);//mute
+					}
+			} catch (Exception e) {
+				Logger.error("andon value handle error in syncstate",e);
+			}});
+	    		//完成历史任务 恢复状体
+	    		flag = true;
+	    	}
+	    }
+}
+s's
